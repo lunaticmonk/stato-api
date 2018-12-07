@@ -1,0 +1,19 @@
+{
+  "name": "stato-api",
+  "version": "1.0.0",
+  "description": "Backend for the stato.",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon src/index.js"
+  },
+  "keywords": [],
+  "author": "Sumedh Nimkarde(lunaticmonk)",
+  "license": "MIT",
+  "dependencies": {
+    "bookshelf": "^0.13.3",
+    "dotenv": "^6.2.0",
+    "express": "^4.16.4",
+    "knex": "^0.13.0",
+    "winston": "^3.1.0"
+  }
+}
