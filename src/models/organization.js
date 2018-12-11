@@ -1,9 +1,9 @@
 'use strict';
 
-const Bookshelf = require('../database');
+const db = require('../database');
 
-const Organization = Bookshelf.Model.extend({
-  tableName: 'organizations',
+const Organization = db.Model.extend({
+  tableName: 'organizations'
 });
 
-module.exports = Bookshelf.Model('Organization', 'Organization');
+module.exports = Organization;

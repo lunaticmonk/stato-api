@@ -1,9 +1,12 @@
 'use strict';
 
-const Bookshelf = require('../database');
+const db = require('../database');
 
-const User = Bookshelf.Model.extend({
+const User = db.Model.extend({
   tableName: 'users',
+  hasTimestamps: true,
+  idAttribute: null
 });
 
-module.exports = Bookshelf.Model('User', 'User');
+// module.exports = db.Model('User', User);
+module.exports = User;
