@@ -20,17 +20,16 @@ router.post("/signup", async (req, res) => {
   try {
     console.log(`POST /signup`);
     const result = await userController.saveUser(req.body);
-    res.status(200).send(result);
+    res.status(result.code).send(result);
   } catch (error) {
-    res.status(500).send({
-      error
+    res.status(error.code).send({
+      error: error
     });
   }
 });
 
 router.post("/signin", async (req, res) => {
   try {
-    console.log(`POST /signin`);
     const accessToken = req.headers["x-access-token"];
     const result = await userController.login(accessToken, req.body);
     logger.info(result.message);
