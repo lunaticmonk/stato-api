@@ -3,7 +3,9 @@
 const db = require('../database');
 
 const Organization = db.Model.extend({
-  tableName: 'organizations'
+  tableName: 'organizations',
+  hasTimestamps: true,
+  idAttribute: null
 });
 
 module.exports = Organization;
