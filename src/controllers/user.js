@@ -1,3 +1,10 @@
+/**
+ * User controller.
+ * Contains all the business logic executed after
+ * hitting any user endpoint in routes.
+ *
+ */
+
 "use strict";
 
 const jwt = require("jsonwebtoken");
@@ -73,13 +80,13 @@ function login(body) {
 					(err, passwordCorrect) => {
 						if (passwordCorrect) {
 							const accessToken = jwt.sign({ email }, config.secret, {
-								expiresIn: "24h"
-							});
-							const refreshToken = jwt.sign({ email }, config.secret, {
 								expiresIn: "1w"
 							});
+							const refreshToken = jwt.sign({ email }, config.secret, {
+								expiresIn: "2w"
+							});
 							const response = {
-								email,
+								user: model,
 								refreshToken: refreshToken,
 								accessToken: accessToken
 							};
@@ -135,8 +142,40 @@ function getNewAccessToken(body) {
 	}
 }
 
+function getMe(accessToken) {
+	return new Promise((resolve, reject) => {
+		return jwt.verify(accessToken, config.secret, async (err, decoded) => {
+			if (err) {
+				console.log(err);
+				if (err.name === "TokenExpiredError") {
+					console.log(`>>> Token expired`);
+					reject({
+						success: false,
+						message: `TokenExpiredError`,
+						code: 404
+					});
+				}
+				reject({
+					success: false,
+					message: `Unauthorized`,
+					code: 401
+				});
+			} else {
+				// logger.warn(JSON.stringify(decoded));
+				resolve({
+					data: await User.where({ email: decoded.email }).fetch(),
+					success: true,
+					code: 200,
+					message: 'decoded'
+				});
+			}
+		});
+	});
+}
+
 module.exports = {
 	saveUser,
 	login,
-	getNewAccessToken
+	getNewAccessToken,
+	getMe
 };
