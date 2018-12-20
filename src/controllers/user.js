@@ -7,12 +7,13 @@
 
 "use strict";
 
-const jwt = require("jsonwebtoken");
+const uuid = require('uuid/v1');
 const bcrypt = require("bcryptjs");
-const config = require("../../config/config");
-const uuid = require("uuid/v1");
-const User = require("../models/user");
+const jwt = require("jsonwebtoken");
 const logger = require("../logger");
+const User = require("../models/user");
+const config = require("../../config/config");
+
 const tokenList = {};
 
 function saveUser(body) {
@@ -41,15 +42,16 @@ function saveUser(body) {
 				})
 					.save()
 					.then(model => {
+						console.log(`>>> User registered: ${model.get('uuid')}`);
 						const response = {
 							success: true,
-							message: "Authentication successful!",
+							message: "Registered user",
 							code: 200
 						};
 						return response;
 					})
 					.catch(error => {
-						logger.warn(`Authentication failed for email: ${email} ${error}`);
+						logger.warn(`Register user failed: ${email} ${error}`);
 						return {
 							success: false,
 							message: `Request failed. Please try again`,
@@ -74,6 +76,13 @@ function login(body) {
 		return User.where({ email })
 			.fetch()
 			.then(model => {
+				if (!model) {
+					reject({
+						success: false,
+						message: `User with email id: ${email} does not exist`,
+						code: 200
+					});
+				}
 				bcrypt.compare(
 					password,
 					model.get("password"),

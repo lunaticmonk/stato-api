@@ -83,7 +83,7 @@ router.get("/token", async (req, res) => {
  * returns user from accessToken
  *
  */
-router.get("/users/me", async (req, res) => {
+router.get("/users/me", isAuthenticated, async (req, res) => {
   try {
     const accessToken = req.headers["x-access-token"];
     const result = await userController.getMe(accessToken);
@@ -100,7 +100,7 @@ router.get("/users/me", async (req, res) => {
  * by user.
  *
  */
-router.get("/admin/organizations", async (req, res) => {
+router.get("/admin/organizations", isAuthenticated, async (req, res) => {
   try {
     const accessToken = req.headers["x-access-token"];
     const result = await organizationController.getAllOrganizationsPerAdmin(accessToken);
