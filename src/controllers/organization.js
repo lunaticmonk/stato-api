@@ -7,13 +7,14 @@
 
 "use strict";
 
-const uuid = require('uuid/v1');
+const uuid = require("uuid/v1");
 const logger = require("../logger");
 const Organization = require("../models/organization");
+const User = require("../models/user");
 const userController = require("./user");
 
 function createOrganization(body) {
-  const { name, email, url, admin } = body;
+	const { name, email, url, admin } = body;
 	return Organization.forge({
 		uuid: uuid(),
 		name,
@@ -29,16 +30,16 @@ function createOrganization(body) {
 					uuid: model.get("uuid"),
 					name: model.get("name"),
 					url: model.get("url"),
-          admin: model.get("admin"),
-          invite_key: model.get("invite_key")
+					admin: model.get("admin"),
+					invite_key: model.get("invite_key")
 				},
 				message: `Organization created`,
 				code: 200
 			};
 		})
 		.catch(err => {
-      // logger.error(err);
-      console.log(err);
+			// logger.error(err);
+			console.log(err);
 			return {
 				success: false,
 				message: `Unknown error.`,
@@ -78,7 +79,37 @@ async function getAllOrganizationsPerAdmin(accessToken) {
 	});
 }
 
+async function joinOrganization(accessToken, body) {
+	return new Promise(async (resolve, reject) => {
+		const { email, invite_key } = body;
+		try {
+			const organization = await Organization.where({ invite_key }).fetch();
+			const organizationUuid = organization.get("uuid");
+			console.log(`Organization uuid: ${organizationUuid}`);
+			const user = await User.where({
+				email
+			}).save({ organization_id: organizationUuid }, { method: 'update' });
+			console.log(`>>> Set org_id ${user.get("organization_id")}`);
+			resolve({
+				success: true,
+				message: `Joined the organization: ${organization.get(
+					"name"
+				)} successful`,
+				code: 200
+			});
+		} catch (err) {
+			console.log(err);
+			reject({
+				success: false,
+				message: `Joining organization failed`,
+				code: 200
+			});
+		}
+	});
+}
+
 module.exports = {
 	createOrganization,
-	getAllOrganizationsPerAdmin
+	getAllOrganizationsPerAdmin,
+	joinOrganization
 };
