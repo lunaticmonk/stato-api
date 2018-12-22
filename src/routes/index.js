@@ -115,7 +115,7 @@ router.get("/admin/organizations", isAuthenticated, async (req, res) => {
 router.post("/organizations/join", isAuthenticated, async (req, res) => {
   try {
     const accessToken = req.headers["x-access-token"];
-    const result = await organizationController.joinOrganization(accessToken, req.body);
+    const result = await organizationController.joinOrganization(req.body);
     logger.info(result.message);
     res.status(result.code).send(result);
   } catch (error) {

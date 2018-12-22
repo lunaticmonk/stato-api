@@ -79,7 +79,7 @@ async function getAllOrganizationsPerAdmin(accessToken) {
 	});
 }
 
-async function joinOrganization(accessToken, body) {
+async function joinOrganization(body) {
 	return new Promise(async (resolve, reject) => {
 		const { email, invite_key } = body;
 		try {
