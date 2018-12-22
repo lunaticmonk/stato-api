@@ -2,10 +2,10 @@
 
 const db = require("../database");
 
-const User = db.Model.extend({
-	tableName: "users",
+const Status = db.Model.extend({
+	tableName: "status",
 	hasTimestamps: true,
 	idAttribute: null
 });
 
-module.exports = User;
+module.exports = Status;

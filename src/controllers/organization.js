@@ -11,6 +11,7 @@ const uuid = require("uuid/v1");
 const logger = require("../logger");
 const Organization = require("../models/organization");
 const User = require("../models/user");
+const Status = require("../models/status");
 const userController = require("./user");
 
 function createOrganization(body) {
@@ -23,7 +24,12 @@ function createOrganization(body) {
 		invite_key: uuid()
 	})
 		.save()
-		.then(model => {
+		.then(async model => {
+			console.log(`>>> joining organization`);
+			await joinOrganization({
+				uuid: admin,
+				invite_key: model.get("invite_key")
+			});
 			return {
 				success: true,
 				data: {
@@ -38,7 +44,7 @@ function createOrganization(body) {
 			};
 		})
 		.catch(err => {
-			// logger.error(err);
+			logger.error(err);
 			console.log(err);
 			return {
 				success: false,
@@ -81,24 +87,42 @@ async function getAllOrganizationsPerAdmin(accessToken) {
 
 async function joinOrganization(body) {
 	return new Promise(async (resolve, reject) => {
-		const { email, invite_key } = body;
+		const { uuid: userId, invite_key } = body;
 		try {
 			const organization = await Organization.where({ invite_key }).fetch();
-			const organizationUuid = organization.get("uuid");
-			console.log(`Organization uuid: ${organizationUuid}`);
-			const user = await User.where({
-				email
-			}).save({ organization_id: organizationUuid }, { method: 'update' });
-			console.log(`>>> Set org_id ${user.get("organization_id")}`);
-			resolve({
-				success: true,
-				message: `Joined the organization: ${organization.get(
-					"name"
-				)} successful`,
+			const organizationId = organization.get("uuid");
+			const user = await Status.where({
+				user_id: userId,
+				organization_id: organizationId
+			}).fetch();
+			if (!user) {
+				/**
+				 * user not the member. insert.
+				 */
+				const status = await Status.forge({
+					uuid: uuid(),
+					user_id: userId,
+					organization_id: organizationId,
+					status: null
+				}).save();
+				logger.info(`>>> ${status.get('user_id')} joined ${status.get('organization_id')}`);
+				resolve({
+					success: true,
+					message: `Joined the organization: ${organization.get(
+						"name"
+					)} successful`,
+					code: 200
+				});
+			}
+			/**
+			 * user already member of the org. throw error
+			 */
+			reject({
+				success: false,
+				message: `Failed. User already part of the organization.`,
 				code: 200
 			});
 		} catch (err) {
-			console.log(err);
 			reject({
 				success: false,
 				message: `Joining organization failed`,
