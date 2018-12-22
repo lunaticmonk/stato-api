@@ -105,7 +105,9 @@ async function joinOrganization(body) {
 					organization_id: organizationId,
 					status: null
 				}).save();
-				logger.info(`>>> ${status.get('user_id')} joined ${status.get('organization_id')}`);
+				logger.info(
+					`>>> ${status.get("user_id")} joined ${status.get("organization_id")}`
+				);
 				resolve({
 					success: true,
 					message: `Joined the organization: ${organization.get(
@@ -132,8 +134,44 @@ async function joinOrganization(body) {
 	});
 }
 
+function getMyOrganizations(accessToken) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			const user = await userController.getMe(accessToken);
+			const userId = user.data.get("uuid");
+
+			let userOrganizationRelations = await Status.where({
+				user_id: userId
+			}).fetchAll();
+			userOrganizationRelations = userOrganizationRelations.toJSON();
+
+			let organizationInfo = [];
+			for (const relation of userOrganizationRelations) {
+				logger.warn(`Fetching organization with id: ${relation.organization_id}`);
+				let userOrganization = await Organization.where({ uuid: relation.organization_id }).fetch();
+				logger.warn(`Fetched organization: ${userOrganization}`);
+				organizationInfo.push(userOrganization);
+			}
+			resolve({
+				success: true,
+				data: organizationInfo,
+				message: `Returned user organizations`,
+				code: 200
+			});
+		} catch (err) {
+			logger.error(err);
+			reject({
+				success: false,
+				message: `Failed to return user organizations.`,
+				code: 200
+			});
+		}
+	});
+}
+
 module.exports = {
 	createOrganization,
 	getAllOrganizationsPerAdmin,
-	joinOrganization
+	joinOrganization,
+	getMyOrganizations
 };
