@@ -63,7 +63,33 @@ function updateStatus(body) {
 	});
 }
 
+function removeUserFromOrganization(body) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			const { user_id, organization_id } = body;
+			const status = await Status.where({
+				user_id,
+				organization_id
+			}).destroy();
+			resolve({
+				success: true,
+				data: status,
+				message: `Removed user from the organization.`,
+				code: 200
+			});
+		} catch (err) {
+			console.log(err);
+			reject({
+				success: false,
+				message: "Error removing user from the organization.",
+				code: 200
+			});
+		}
+	});
+}
+
 module.exports = {
 	updateStatus,
-	getStatus
+    getStatus,
+    removeUserFromOrganization
 };

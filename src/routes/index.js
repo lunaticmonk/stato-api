@@ -206,4 +206,19 @@ router.post("/status/update", isAuthenticated, async (req, res) => {
 	}
 });
 
+/**
+ * remove user from the organization.
+ *
+ */
+router.delete("/status/remove", isAuthenticated, async (req, res) => {
+	try {
+		const result = await statusController.removeUserFromOrganization(req.body);
+		logger.info(result.message);
+		res.status(result.code).send(result);
+	} catch (error) {
+		logger.error(error.message);
+		res.status(error.code).send(error);
+	}
+});
+
 module.exports = router;
