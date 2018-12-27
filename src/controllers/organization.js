@@ -147,9 +147,9 @@ function getMyOrganizations(accessToken) {
 
 			let organizationInfo = [];
 			for (const relation of userOrganizationRelations) {
-				logger.warn(`Fetching organization with id: ${relation.organization_id}`);
-				let userOrganization = await Organization.where({ uuid: relation.organization_id }).fetch();
-				logger.warn(`Fetched organization: ${userOrganization}`);
+				let userOrganization = await Organization.where({
+					uuid: relation.organization_id
+				}).fetch();
 				organizationInfo.push(userOrganization);
 			}
 			resolve({
@@ -169,9 +169,58 @@ function getMyOrganizations(accessToken) {
 	});
 }
 
+function getOrganizationMembers(query, organizationId) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			let userOrganizationRelations = await Status.where({
+				organization_id: organizationId
+			}).fetchAll();
+			userOrganizationRelations = userOrganizationRelations.toJSON();
+
+			let membersInfo = [];
+			console.log(`>>> after membersInfo`);
+			for (const relation of userOrganizationRelations) {
+				if (query === undefined) {
+					console.log(`>>> empty query`);
+					query = "*";
+				}
+				let qb = User.query();
+				let member = await qb
+					.where({ uuid: relation.user_id })
+					.andWhere("first_name", "LIKE", query + "%")
+					.columns(["uuid", "first_name", "last_name", "email"]);
+				if (member.length > 0) {
+					membersInfo = [...membersInfo, ...member];
+				}
+			}
+			await Promise.all(
+				membersInfo.map(async member => {
+					let status = await Status.where({ user_id: member.uuid }).fetch();
+					member.status = status.get("status");
+				})
+			);
+
+			resolve({
+				success: true,
+				data: membersInfo,
+				message: `Returned organization members`,
+				code: 200
+			});
+		} catch (err) {
+			console.log(err);
+			reject({
+				success: false,
+				message: `Failed to return organization members.`,
+				code: 200
+			});
+		}
+	});
+}
+
 module.exports = {
 	createOrganization,
 	getAllOrganizationsPerAdmin,
 	joinOrganization,
-	getMyOrganizations
+	getMyOrganizations,
+	getOrganizationMembers
 };

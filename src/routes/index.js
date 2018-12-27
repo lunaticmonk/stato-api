@@ -7,28 +7,29 @@ const logger = require("../logger");
 
 const userController = require("../controllers/user");
 const organizationController = require("../controllers/organization");
-const { isAuthenticated } = require('../policies/policy');
+const statusController = require("../controllers/status");
+const { isAuthenticated } = require("../policies/policy");
 
 /**
  * Make the requests async
  *
  */
 router.get("/", (req, res) => {
-  res.status(200).send("mkl");
+	res.status(200).send("mkl");
 });
 
 /**
  * SIGNUP Endpoint
  */
 router.post("/signup", async (req, res) => {
-  try {
-    const result = await userController.saveUser(req.body);
-    res.status(result.code).send(result);
-  } catch (error) {
-    res.status(error.code).send({
-      error: error
-    });
-  }
+	try {
+		const result = await userController.saveUser(req.body);
+		res.status(result.code).send(result);
+	} catch (error) {
+		res.status(error.code).send({
+			error: error
+		});
+	}
 });
 
 /**
@@ -37,14 +38,14 @@ router.post("/signup", async (req, res) => {
  *
  */
 router.post("/signin", async (req, res) => {
-  try {
-    const result = await userController.login(req.body);
-    logger.info(result.message);
-    res.status(result.code).send(result);
-  } catch (error) {
-    logger.error(error.message);
-    res.status(error.code).send(error);
-  }
+	try {
+		const result = await userController.login(req.body);
+		logger.info(result.message);
+		res.status(result.code).send(result);
+	} catch (error) {
+		logger.error(error.message);
+		res.status(error.code).send(error);
+	}
 });
 
 /**
@@ -52,16 +53,20 @@ router.post("/signin", async (req, res) => {
  * returns created organization.
  *
  */
-router.post("/admin/organizations/create", isAuthenticated, async (req, res) => {
-  try {
-    const result = await organizationController.createOrganization(req.body);
-    logger.info(result.message);
-    res.status(result.code).send(result);
-  } catch (error) {
-    logger.error(error.message);
-    res.status(error.code).send(error);
-  }
-});
+router.post(
+	"/admin/organizations/create",
+	isAuthenticated,
+	async (req, res) => {
+		try {
+			const result = await organizationController.createOrganization(req.body);
+			logger.info(result.message);
+			res.status(result.code).send(result);
+		} catch (error) {
+			logger.error(error.message);
+			res.status(error.code).send(error);
+		}
+	}
+);
 
 /**
  * getAccessToken endpoint. returns new access token
@@ -69,14 +74,14 @@ router.post("/admin/organizations/create", isAuthenticated, async (req, res) => 
  *
  */
 router.get("/token", async (req, res) => {
-  try {
-    const result = await userController.getNewAccessToken(req.body);
-    logger.info(result.message);
-    res.status(result.code).send(result);
-  } catch (error) {
-    logger.error(error.message);
-    res.status(error.code).send(error);
-  }
+	try {
+		const result = await userController.getNewAccessToken(req.body);
+		logger.info(result.message);
+		res.status(result.code).send(result);
+	} catch (error) {
+		logger.error(error.message);
+		res.status(error.code).send(error);
+	}
 });
 
 /**
@@ -84,15 +89,15 @@ router.get("/token", async (req, res) => {
  *
  */
 router.get("/users/me", isAuthenticated, async (req, res) => {
-  try {
-    const accessToken = req.headers["x-access-token"];
-    const result = await userController.getMe(accessToken);
-    logger.info(result.message);
-    res.status(result.code).send(result);
-  } catch (error) {
-    logger.error(error.message);
-    res.status(error.code).send(error);
-  }
+	try {
+		const accessToken = req.headers["x-access-token"];
+		const result = await userController.getMe(accessToken);
+		logger.info(result.message);
+		res.status(result.code).send(result);
+	} catch (error) {
+		logger.error(error.message);
+		res.status(error.code).send(error);
+	}
 });
 
 /**
@@ -101,30 +106,32 @@ router.get("/users/me", isAuthenticated, async (req, res) => {
  *
  */
 router.get("/admin/organizations", isAuthenticated, async (req, res) => {
-  try {
-    const accessToken = req.headers["x-access-token"];
-    const result = await organizationController.getAllOrganizationsPerAdmin(accessToken);
-    logger.info(result.message);
-    res.status(result.code).send(result);
-  } catch (error) {
-    logger.error(error.message);
-    res.status(error.code).send(error);
-  }
+	try {
+		const accessToken = req.headers["x-access-token"];
+		const result = await organizationController.getAllOrganizationsPerAdmin(
+			accessToken
+		);
+		logger.info(result.message);
+		res.status(result.code).send(result);
+	} catch (error) {
+		logger.error(error.message);
+		res.status(error.code).send(error);
+	}
 });
 
 /**
  * Join the organization endpoint.
  */
 router.post("/organizations/join", isAuthenticated, async (req, res) => {
-  try {
-    const accessToken = req.headers["x-access-token"];
-    const result = await organizationController.joinOrganization(req.body);
-    logger.info(result.message);
-    res.status(result.code).send(result);
-  } catch (error) {
-    logger.error(error.message);
-    res.status(error.code).send(error);
-  }
+	try {
+		const accessToken = req.headers["x-access-token"];
+		const result = await organizationController.joinOrganization(req.body);
+		logger.info(result.message);
+		res.status(result.code).send(result);
+	} catch (error) {
+		logger.error(error.message);
+		res.status(error.code).send(error);
+	}
 });
 
 /**
@@ -132,15 +139,71 @@ router.post("/organizations/join", isAuthenticated, async (req, res) => {
  *
  */
 router.get("/organizations/me", isAuthenticated, async (req, res) => {
-  try {
-    const accessToken = req.headers["x-access-token"];
-    const result = await organizationController.getMyOrganizations(accessToken);
-    logger.info(result.message);
-    res.status(result.code).send(result);
-  } catch (error) {
-    logger.error(error.message);
-    res.status(error.code).send(error);
-  }
+	try {
+		const accessToken = req.headers["x-access-token"];
+		const result = await organizationController.getMyOrganizations(accessToken);
+		logger.info(result.message);
+		res.status(result.code).send(result);
+	} catch (error) {
+		logger.error(error.message);
+		res.status(error.code).send(error);
+	}
+});
+
+/**
+ * Get organization members.
+ *
+ */
+router.get(
+	"/organizations/:uuid/members",
+	isAuthenticated,
+	async (req, res) => {
+		try {
+			console.log(`>>> query: ${req.query["name"]}`);
+			const organizationId = req.params["uuid"];
+			const query = req.query["name"] || "";
+			const result = await organizationController.getOrganizationMembers(
+				query,
+				organizationId
+			);
+			logger.info(result.message);
+			res.status(result.code).send(result);
+		} catch (error) {
+			logger.error(error.message);
+			res.status(error.code).send(error);
+		}
+	}
+);
+
+/**
+ * Get the user status from user_id and organization_id.
+ */
+
+router.get("/status", isAuthenticated, async (req, res) => {
+	try {
+		const result = await statusController.getStatus(req.query);
+		logger.info(result.message);
+		res.status(result.code).send(result);
+	} catch (error) {
+		logger.error(error.message);
+		res.status(error.code).send(error);
+	}
+});
+
+/**
+ * update status endpoint.
+ *
+ */
+
+router.post("/status/update", isAuthenticated, async (req, res) => {
+	try {
+		const result = await statusController.updateStatus(req.body);
+		logger.info(result.message);
+		res.status(result.code).send(result);
+	} catch (error) {
+		logger.error(error.message);
+		res.status(error.code).send(error);
+	}
 });
 
 module.exports = router;
