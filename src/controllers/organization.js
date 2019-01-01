@@ -200,6 +200,7 @@ function getOrganizationMembers(query, organizationId) {
 						organization_id: organizationId
 					}).fetch();
 					member.status = status.get("status");
+					member.statusUpdatedAt = status.get('updated_at');
 				})
 			);
 
