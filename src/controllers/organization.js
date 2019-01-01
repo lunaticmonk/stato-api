@@ -195,7 +195,10 @@ function getOrganizationMembers(query, organizationId) {
 			}
 			await Promise.all(
 				membersInfo.map(async member => {
-					let status = await Status.where({ user_id: member.uuid }).fetch();
+					let status = await Status.where({
+						user_id: member.uuid,
+						organization_id: organizationId
+					}).fetch();
 					member.status = status.get("status");
 				})
 			);
