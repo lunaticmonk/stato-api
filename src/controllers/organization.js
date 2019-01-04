@@ -98,18 +98,26 @@ async function joinOrganization(body) {
 			if (!user) {
 				/**
 				 * user not the member. insert.
+				 * TODO:// run a migration setting default status to "online".
+				 * Currently it is hardcoded below.
 				 */
 				const status = await Status.forge({
 					uuid: uuid(),
 					user_id: userId,
 					organization_id: organizationId,
-					status: null
+					status: "online"
 				}).save();
 				logger.info(
 					`>>> ${status.get("user_id")} joined ${status.get("organization_id")}`
 				);
+
+				const response = {
+					organization_id: organizationId
+				};
+
 				resolve({
 					success: true,
+					data: response,
 					message: `Joined the organization: ${organization.get(
 						"name"
 					)} successful`,
@@ -200,7 +208,7 @@ function getOrganizationMembers(query, organizationId) {
 						organization_id: organizationId
 					}).fetch();
 					member.status = status.get("status");
-					member.statusUpdatedAt = status.get('updated_at');
+					member.statusUpdatedAt = status.get("updated_at");
 				})
 			);
 
