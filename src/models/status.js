@@ -3,7 +3,7 @@
 const db = require("../database");
 
 const Status = db.Model.extend({
-	tableName: "status",
+	tableName: "statuses",
 	hasTimestamps: true,
 	idAttribute: null
 });

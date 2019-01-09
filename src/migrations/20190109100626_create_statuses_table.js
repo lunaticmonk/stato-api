@@ -1,6 +1,6 @@
 exports.up = function(knex, Promise) {
 	return Promise.all([
-		knex.schema.createTable("status", function(table) {
+		knex.schema.createTable("statuses", function(table) {
 			table
 				.uuid("uuid")
 				.primary()
@@ -20,5 +20,5 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
-	return knex.schema.dropTable("status");
+	return knex.schema.dropTable("statuses");
 };
