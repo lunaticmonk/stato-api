@@ -4,7 +4,8 @@
   "description": "Backend for the stato.",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/index.js"
+    "start": "nodemon src/index.js",
+    "daemon": "pm2 start src/index.js"
   },
   "keywords": [],
   "author": "Sumedh Nimkarde(lunaticmonk)",
