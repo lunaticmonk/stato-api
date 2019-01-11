@@ -182,9 +182,29 @@ function getMe(accessToken) {
 	});
 }
 
+async function getUserFromUuid(uuid) {
+	try {
+		const user = await User.where({ uuid }).fetch();
+		const response = {
+			data: user,
+			success: true,
+			code: 200,
+			message: 'Returned user'
+		};
+		return response;
+	} catch(err) {
+		return {
+			success: false,
+			code: 404,
+			message: err
+		};
+	}
+}
+
 module.exports = {
 	saveUser,
 	login,
 	getNewAccessToken,
-	getMe
+	getMe,
+	getUserFromUuid
 };

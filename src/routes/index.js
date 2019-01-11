@@ -8,7 +8,7 @@ const logger = require("../logger");
 const userController = require("../controllers/user");
 const organizationController = require("../controllers/organization");
 const statusController = require("../controllers/status");
-const { isAuthenticated } = require("../policies/policy");
+const { isAuthenticated, isSelf } = require("../policies/policy");
 
 /**
  * Make the requests async
@@ -122,7 +122,7 @@ router.get("/admin/organizations", isAuthenticated, async (req, res) => {
 /**
  * Join the organization endpoint.
  */
-router.post("/organizations/join", isAuthenticated, async (req, res) => {
+router.post("/organizations/join", isAuthenticated, isSelf, async (req, res) => {
 	try {
 		const accessToken = req.headers["x-access-token"];
 		const result = await organizationController.joinOrganization(req.body);
@@ -195,7 +195,7 @@ router.get("/status", isAuthenticated, async (req, res) => {
  *
  */
 
-router.post("/status/update", isAuthenticated, async (req, res) => {
+router.post("/status/update", isAuthenticated, isSelf, async (req, res) => {
 	try {
 		const result = await statusController.updateStatus(req.body);
 		logger.info(result.message);
