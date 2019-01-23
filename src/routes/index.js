@@ -1,8 +1,9 @@
 "use strict";
 
 const { Router } = require("express");
-
 const router = new Router();
+
+const fs = require('fs');
 const logger = require("../logger");
 
 const userController = require("../controllers/user");
@@ -218,6 +219,16 @@ router.delete("/status/remove", isAuthenticated, async (req, res) => {
 	} catch (error) {
 		logger.error(error.message);
 		res.status(error.code).send(error);
+	}
+});
+
+router.post("/privateIp", async (req, res) => {
+	try {
+		const result = await fs.writeFile('./private-ip.txt', JSON.stringify(req.body));
+		console.log(`written: ${JSON.stringify(result)}`);
+		res.status(200).send({ result });
+	} catch (error) {
+		console.log(`Error: ${error}`);
 	}
 });
 
